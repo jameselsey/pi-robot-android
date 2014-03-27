@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,6 +19,9 @@ public class MainActivity extends Activity {
 
 
     private static final String TAG = "OUTPUT";
+
+    private static final String serverIp = "192.168.0.11";
+    private static final int serverPort = 3033;
 
     private final String leftForwardCommand = "L-FORWARD";
     private final String leftBackCommand = "L-BACK";
@@ -34,6 +38,9 @@ public class MainActivity extends Activity {
         Button leftBack = (Button) findViewById(R.id.leftBack);
         Button rightForward = (Button) findViewById(R.id.rightForward);
         Button rightBack = (Button) findViewById(R.id.rightBack);
+
+        TextView serverIpTextView = (TextView) findViewById(R.id.serverIp);
+        serverIpTextView.setText(serverIp + ":" + serverPort);
 
         leftForward.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -116,7 +123,7 @@ public class MainActivity extends Activity {
             String command = commands[0];
             try {
                 //TODO: make this configurable inside the app
-                Socket socket = new Socket("192.168.0.11", 3033);
+                Socket socket = new Socket(serverIp, serverPort);
                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 out.write(command);
                 out.flush();
