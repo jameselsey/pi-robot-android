@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -15,13 +15,15 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static java.lang.String.format;
+
 public class MainActivity extends Activity {
 
 
     private static final String TAG = "OUTPUT";
 
-    private static final String serverIp = "192.168.0.11";
-    private static final int serverPort = 3033;
+    private String serverIp = "192.168.0.11";
+    private int serverPort = 3033;
 
     private final String leftForwardCommand = "L-FORWARD";
     private final String leftBackCommand = "L-BACK";
@@ -39,8 +41,29 @@ public class MainActivity extends Activity {
         Button rightForward = (Button) findViewById(R.id.rightForward);
         Button rightBack = (Button) findViewById(R.id.rightBack);
 
-        TextView serverIpTextView = (TextView) findViewById(R.id.serverIp);
-        serverIpTextView.setText(serverIp + ":" + serverPort);
+        EditText serverIpEditText = (EditText) findViewById(R.id.ipAddress);
+        serverIpEditText.setText(serverIp);
+        serverIpEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    serverIp = ((EditText)v).getText().toString();
+                    Log.d(TAG,"User has lost focus on serverIpEditText, updating server ip to " + serverIp);
+                }
+            }
+        });
+
+        EditText serverPortEditText = (EditText) findViewById(R.id.port);
+        serverPortEditText.setText("" + serverPort);
+        serverPortEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    serverPort = Integer.parseInt(((EditText)v).getText().toString());
+                    Log.d(TAG,"User has lost focus on portEditText, updating port to " + serverPort);
+                }
+            }
+        });
 
         leftForward.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -122,6 +145,8 @@ public class MainActivity extends Activity {
         protected Void doInBackground(String... commands) {
             String command = commands[0];
             try {
+
+                Log.d(TAG, format("Sending command %s to %s:%d", command, serverIp, serverPort));
                 //TODO: make this configurable inside the app
                 Socket socket = new Socket(serverIp, serverPort);
                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
