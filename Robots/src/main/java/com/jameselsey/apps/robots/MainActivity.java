@@ -1,6 +1,8 @@
 package com.jameselsey.apps.robots;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -70,10 +72,12 @@ public class MainActivity extends Activity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
+                        buttonPress(view);
                         sendCommand(leftForwardCommand + "-Start");
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
+                        buttonRelease(view);
                         sendCommand(leftForwardCommand + "-Stop");
                         break;
                     }
@@ -87,10 +91,12 @@ public class MainActivity extends Activity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
+                        buttonPress(view);
                         sendCommand(leftBackCommand + "-Start");
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
+                        buttonRelease(view);
                         sendCommand(leftBackCommand + "-Stop");
                         break;
                     }
@@ -104,10 +110,12 @@ public class MainActivity extends Activity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
+                        buttonPress(view);
                         sendCommand(rightForwardCommand + "-Start");
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
+                        buttonRelease(view);
                         sendCommand(rightForwardCommand + "-Stop");
                         break;
                     }
@@ -121,10 +129,12 @@ public class MainActivity extends Activity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
+                        buttonPress(view);
                         sendCommand(rightBackCommand + "-Start");
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
+                        buttonRelease(view);
                         sendCommand(rightBackCommand + "-Stop");
                         break;
                     }
@@ -134,6 +144,13 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void buttonPress(View v){
+        v.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+    }
+
+    private void buttonRelease(View v){
+        v.getBackground().clearColorFilter();
+    }
 
     private void sendCommand(String command) {
         new SendCommandTask().execute(command);
@@ -144,9 +161,9 @@ public class MainActivity extends Activity {
         @Override
         protected Void doInBackground(String... commands) {
             String command = commands[0];
+            Log.d(TAG, format("Sending command %s to %s:%d", command, serverIp, serverPort));
             try {
 
-                Log.d(TAG, format("Sending command %s to %s:%d", command, serverIp, serverPort));
                 //TODO: make this configurable inside the app
                 Socket socket = new Socket(serverIp, serverPort);
                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
